@@ -1,0 +1,74 @@
+[
+  {
+    "id": 1,
+    "title": "The Legend of Zelda: Tears of the Kingdom",
+    "developer": "Nintendo",
+    "genre": "Aventura / RPG",
+    "platform": "Nintendo Switch",
+    "image": "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&auto=format&fit=crop&q=80",
+    "description": "Explora los cielos y las profundidades de Hyrule en una odisea épica de creatividad y libertad sin límites."
+  },
+  {
+    "id": 2,
+    "title": "Elden Ring",
+    "developer": "FromSoftware",
+    "genre": "Soulslike / Acción",
+    "platform": "PC / PS5 / Xbox Series",
+    "image": "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&auto=format&fit=crop&q=80",
+    "description": "Alzate, Sinluz, y sé guiado por la gracia para blandir el poder del Círculo de Elden en las Tierras Intermedias."
+  },
+  {
+    "id": 3,
+    "title": "Hollow Knight",
+    "developer": "Team Cherry",
+    "genre": "Metroidvania",
+    "platform": "PC / Consolas",
+    "image": "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=600&auto=format&fit=crop&q=80",
+    "description": "Desciende al reino subterráneo en ruinas de Hallownest, combate criaturas infectadas y descubre secretos arcanos."
+  },
+  {
+    "id": 4,
+    "title": "Cyberpunk 2077",
+    "developer": "CD Projekt Red",
+    "genre": "RPG de Acción",
+    "platform": "PC / PS5 / Xbox Series",
+    "image": "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=600&auto=format&fit=crop&q=80",
+    "description": "Una historia de acción y aventura de mundo abierto ambientada en la megalópolis futurista de Night City."
+  },
+  {
+    "id": 5,
+    "title": "Celeste",
+    "developer": "Maddy Makes Games",
+    "genre": "Plataformas",
+    "platform": "PC / Consolas",
+    "image": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600&auto=format&fit=crop&q=80",
+    "description": "Ayuda a Madeline a sobrevivir a sus demonios internos en su viaje a la cima de la mística montaña Celeste."
+  },
+  {
+    "id": 6,
+    "title": "Baldur's Gate 3",
+    "developer": "Larian Studios",
+    "genre": "Rol Táctico (CRPG)",
+    "platform": "PC / PS5 / Xbox Series",
+    "image": "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=600&auto=format&fit=crop&q=80",
+    "description": "Reúne a tu grupo y regresa a los Reinos Olvidados en una historia de compañerismo, traición y sacrificio."
+  },
+  {
+    "id": 7,
+    "title": "Hades",
+    "developer": "Supergiant Games",
+    "genre": "Roguelike / Acción",
+    "platform": "PC / Consolas",
+    "image": "https://images.unsplash.com/photo-1563089145-599997674d42?w=600&auto=format&fit=crop&q=80",
+    "description": "Desafía al dios de los muertos mientras combates y escapas del Inframundo en este trepidante roguelike."
+  },
+  {
+    "id": 8,
+    "title": "God of War Ragnarök",
+    "developer": "Santa Monica Studio",
+    "genre": "Acción / Aventura",
+    "platform": "PS5 / PC",
+    "image": "https://images.unsplash.com/photo-1579373903781-fd5c0c30c4cd?w=600&auto=format&fit=crop&q=80",
+    "description": "Kratos y Atreus deben viajar a cada uno de los Nueve Reinos en busca de respuestas ante la inminente profecía."
+  }
+]

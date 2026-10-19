@@ -1,0 +1,128 @@
+name: Pruebas automáticas (Classroom)
+on:
+  push:
+  workflow_dispatch:
+  repository_dispatch:
+
+permissions:
+  checks: write
+  actions: read
+  contents: read
+
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar el repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Instalar dependencias
+        run: npm ci || npm install
+
+      - name: Estructura modular del proyecto
+        id: test-structure-check
+        uses: classroom-resources/autograding-io-grader@v1
+        with:
+          test-name: 'Estructura modular de carpetas y archivos fuente'
+          command: 'bash scripts/classroom-check.sh structure-check'
+          expected-output: 'CORRECTO'
+          comparison-method: exact
+          timeout: 5
+          max-score: 10
+
+      - name: Custom Hook useStorage
+        id: test-use-storage
+        uses: classroom-resources/autograding-io-grader@v1
+        with:
+          test-name: 'Custom Hook useStorage con sincronización en localStorage'
+          command: 'bash scripts/classroom-check.sh use-storage'
+          expected-output: 'CORRECTO'
+          comparison-method: exact
+          timeout: 5
+          max-score: 15
+
+      - name: ThemeContext persistido y Hook useTheme
+        id: test-theme-context
+        uses: classroom-resources/autograding-io-grader@v1
+        with:
+          test-name: 'ThemeContext con persistencia y Hook useTheme con salvaguarda'
+          command: 'bash scripts/classroom-check.sh theme-context'
+          expected-output: 'CORRECTO'
+          comparison-method: exact
+          timeout: 5
+          max-score: 10
+
+      - name: gameReducer y GAME_ACTIONS
+        id: test-game-reducer
+        uses: classroom-resources/autograding-io-grader@v1
+        with:
+          test-name: 'Función reductora pura gameReducer y acciones inmutables'
+          command: 'bash scripts/classroom-check.sh game-reducer'
+          expected-output: 'CORRECTO'
+          comparison-method: exact
+          timeout: 5
+          max-score: 20
+
+      - name: GameContext con useReducer y Storage
+        id: test-game-context
+        uses: classroom-resources/autograding-io-grader@v1
+        with:
+          test-name: 'GameContext con useReducer, persistencia y useGameContext'
+          command: 'bash scripts/classroom-check.sh game-context'
+          expected-output: 'CORRECTO'
+          comparison-method: exact
+          timeout: 5
+          max-score: 15
+
+      - name: Catálogo de Juegos y GameCard
+        id: test-game-catalog
+        uses: classroom-resources/autograding-io-grader@v1
+        with:
+          test-name: 'Catálogo de Juegos y botón dinámico en GameCard'
+          command: 'bash scripts/classroom-check.sh game-catalog'
+          expected-output: 'CORRECTO'
+          comparison-method: exact
+          timeout: 5
+          max-score: 10
+
+      - name: Panel de Biblioteca y Operaciones
+        id: test-library-panel
+        uses: classroom-resources/autograding-io-grader@v1
+        with:
+          test-name: 'Panel de Biblioteca, operaciones interactivas y métricas'
+          command: 'bash scripts/classroom-check.sh library-panel'
+          expected-output: 'CORRECTO'
+          comparison-method: exact
+          timeout: 5
+          max-score: 10
+
+      - name: Compilación de Producción Vite
+        id: test-build-check
+        uses: classroom-resources/autograding-io-grader@v1
+        with:
+          test-name: 'Compilación de producción y empaquetado con Vite'
+          command: 'bash scripts/classroom-check.sh build-check'
+          expected-output: 'CORRECTO'
+          comparison-method: exact
+          timeout: 5
+          max-score: 10
+
+      - name: Autograding Reporter
+        uses: classroom-resources/autograding-grading-reporter@v1
+        env:
+          TEST-STRUCTURE-CHECK_RESULTS: '${{steps.test-structure-check.outputs.result}}'
+          TEST-USE-STORAGE_RESULTS: '${{steps.test-use-storage.outputs.result}}'
+          TEST-THEME-CONTEXT_RESULTS: '${{steps.test-theme-context.outputs.result}}'
+          TEST-GAME-REDUCER_RESULTS: '${{steps.test-game-reducer.outputs.result}}'
+          TEST-GAME-CONTEXT_RESULTS: '${{steps.test-game-context.outputs.result}}'
+          TEST-GAME-CATALOG_RESULTS: '${{steps.test-game-catalog.outputs.result}}'
+          TEST-LIBRARY-PANEL_RESULTS: '${{steps.test-library-panel.outputs.result}}'
+          TEST-BUILD-CHECK_RESULTS: '${{steps.test-build-check.outputs.result}}'
+        with:
+          runners: test-structure-check,test-use-storage,test-theme-context,test-game-reducer,test-game-context,test-game-catalog,test-library-panel,test-build-check

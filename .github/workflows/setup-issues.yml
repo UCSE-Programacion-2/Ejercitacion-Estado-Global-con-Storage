@@ -1,0 +1,251 @@
+# Crea issues de la actividad para repos creados desde GitHub Classroom.
+# Idempotente: crea solamente los issues faltantes por titulo.
+name: Setup assignment issues
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+  repository_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: setup-issues-${{ github.repository }}
+  cancel-in-progress: false
+
+jobs:
+  ensure-assignment-issues:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Crear issues faltantes de la actividad
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: |
+          python3 << 'PY'
+          import json
+          import os
+          import textwrap
+          import urllib.error
+          import urllib.parse
+          import urllib.request
+
+          REPO = os.environ["GITHUB_REPOSITORY"]
+          TOKEN = os.environ["GITHUB_TOKEN"]
+          API = "https://api.github.com"
+          ISSUE_LABEL = "classroom-assignment"
+
+          ISSUES = [
+              {
+                  "title": "[Entrega 1] Estructura base y configuración del entorno",
+                  "body": """
+          ## Objetivo
+          Verificar y familiarizarse con la estructura modular del proyecto, configuraciones de linters y archivos fuente.
+
+          ## Qué debe cumplirse
+          - [ ] Carpetas `src/components`, `src/context`, `src/hook`, `src/data` creadas.
+          - [ ] Archivos canónicos de linters (`.eslintrc.json`, `.stylelintrc.json`, `.prettierrc.js`) presentes.
+          - [ ] Dataset `src/data/games.json` disponible con los 8 títulos icónicos.
+          - [ ] Validar con `bash scripts/classroom-check.sh structure-check`.
+
+          ## Commit sugerido
+          ```
+          chore: configurar estructura inicial y herramientas (Closes #1)
+          ```
+          """,
+              },
+              {
+                  "title": "[Entrega 2] Custom Hook useStorage con sincronización en localStorage",
+                  "body": """
+          ## Objetivo
+          Construir la abstracción modular `src/hook/useStorage.jsx` para sincronizar de manera reactiva el estado de React con `localStorage`.
+
+          ## Qué debe cumplirse
+          - [ ] Implementar la lectura inicial segura con `localStorage.getItem(key)` y `JSON.parse` dentro de un bloque `try/catch`.
+          - [ ] Inicializar el estado local mediante `useState`.
+          - [ ] Configurar un `useEffect` con dependencias `[key, state]` que ejecute `localStorage.setItem(key, JSON.stringify(state))`.
+          - [ ] Retornar la tupla `[state, setState]`.
+          - [ ] Validar con `bash scripts/classroom-check.sh use-storage`.
+
+          ## Commit sugerido
+          ```
+          feat: implementar custom hook useStorage (Closes #2)
+          ```
+          """,
+              },
+              {
+                  "title": "[Entrega 3] ThemeContext persistido y Custom Hook useTheme",
+                  "body": """
+          ## Objetivo
+          Implementar el contexto del tema visual `ThemeContext.jsx` integrando `useStorage` para que el modo visual (claro / oscuro) se guarde entre sesiones.
+
+          ## Qué debe cumplirse
+          - [ ] En `src/context/ThemeContext.jsx`, inicializar `ThemeContext` con `createContext()`.
+          - [ ] Crear `ThemeProvider({ children })` gestionando el estado con `useStorage('gamevault_theme', false)`.
+          - [ ] Implementar la función `toggleTheme()` que alterna el valor booleano.
+          - [ ] Implementar el hook `useTheme()` con la salvaguarda de jerarquía (`throw new Error(...)`).
+          - [ ] Validar con `bash scripts/classroom-check.sh theme-context`.
+
+          ## Commit sugerido
+          ```
+          feat: implementar ThemeContext con persistencia y useTheme (Closes #3)
+          ```
+          """,
+              },
+              {
+                  "title": "[Entrega 4] Función reductora pura gameReducer y constantes GAME_ACTIONS",
+                  "body": """
+          ## Objetivo
+          Centralizar todas las reglas de transición e inmutabilidad de la biblioteca de videojuegos en `src/context/gameReducer.js`.
+
+          ## Qué debe cumplirse
+          - [ ] Definir y exportar `GAME_ACTIONS` con las 6 acciones: `ADD_GAME`, `REMOVE_GAME`, `INCREMENT_HOURS`, `DECREMENT_HOURS`, `UPDATE_STATUS`, `CLEAR_LIBRARY`.
+          - [ ] Implementar `gameReducer(state, action)` gobernado por un `switch(action.type)`.
+          - [ ] `ADD_GAME`: No duplicar si el juego ya existe; si es nuevo, inicializar con `horasJugadas: 0` y `estado: 'Pendiente'`.
+          - [ ] `REMOVE_GAME`: Filtrar excluyendo el ID correspondiente.
+          - [ ] `INCREMENT_HOURS`: Incrementar horas jugadas en 1.
+          - [ ] `DECREMENT_HOURS`: Decrementar horas con cota inferior en 0.
+          - [ ] `UPDATE_STATUS`: Modificar el estado al nuevo valor recibido en payload.
+          - [ ] `CLEAR_LIBRARY`: Restablecer a arreglo vacío `[]`.
+          - [ ] Validar con `bash scripts/classroom-check.sh game-reducer`.
+
+          ## Commit sugerido
+          ```
+          feat: definir gameReducer y tipos de accion GAME_ACTIONS (Closes #4)
+          ```
+          """,
+              },
+              {
+                  "title": "[Entrega 5] GameContext con useReducer y persistencia local",
+                  "body": """
+          ## Objetivo
+          Construir `src/context/GameContext.jsx` vinculando `useReducer` con la función reductora pura y sincronizando en `localStorage`.
+
+          ## Qué debe cumplirse
+          - [ ] Inicializar `useReducer(gameReducer, [], init)` leyendo los datos iniciales de `'gamevault_library'`.
+          - [ ] Persistir los cambios de `library` en `'gamevault_library'` mediante `useEffect`.
+          - [ ] Exponer las funciones despachadoras helper: `addToLibrary`, `removeFromLibrary`, `incrementHours`, `decrementHours`, `updateStatus`, `clearLibrary`.
+          - [ ] Implementar `useGameContext()` con salvaguarda de jerarquía.
+          - [ ] Validar con `bash scripts/classroom-check.sh game-context`.
+
+          ## Commit sugerido
+          ```
+          feat: implementar GameContext con useReducer y almacenamiento local (Closes #5)
+          ```
+          """,
+              },
+              {
+                  "title": "[Entrega 6] Catálogo de Juegos y botón dinámico en GameCard",
+                  "body": """
+          ## Objetivo
+          Renderizar el catálogo de videojuegos e integrar las tarjetas individuales con el estado global de la biblioteca.
+
+          ## Qué debe cumplirse
+          - [ ] En `src/components/GameCatalog.jsx`, iterar `games.json` y renderizar `<GameCard />` para cada elemento.
+          - [ ] En `src/components/GameCard.jsx`, consumir `useGameContext()` para saber si el juego ya fue agregado.
+          - [ ] Si ya está agregado: botón con texto `✔️ En Biblioteca` y atributo `disabled`.
+          - [ ] Si no está agregado: botón con texto `+ Añadir a Backlog` que ejecute `addToLibrary(game)`.
+          - [ ] Validar con `bash scripts/classroom-check.sh game-catalog`.
+
+          ## Commit sugerido
+          ```
+          feat: integrar GameCatalog y GameCard con estado global (Closes #6)
+          ```
+          """,
+              },
+              {
+                  "title": "[Entrega 7] Panel de Biblioteca, controles interactivos y métricas derivadas",
+                  "body": """
+          ## Objetivo
+          Construir la vista interactiva de la biblioteca personal, controles de progreso y cálculo de métricas derivadas en vivo.
+
+          ## Qué debe cumplirse
+          - [ ] En `src/components/LibraryItem.jsx`, conectar botones `+` y `-` con `incrementHours` y `decrementHours`.
+          - [ ] Conectar el `<select>` con `updateStatus(item.id, e.target.value)` para alternar entre `Pendiente`, `Jugando` y `Completado`.
+          - [ ] Conectar el botón de quitar con `removeFromLibrary(item.id)`.
+          - [ ] En `src/components/LibraryPanel.jsx`, mostrar estado vacío didáctico `🎮` si `library.length === 0`.
+          - [ ] Calcular en tiempo de renderizado: total de juegos, total de horas acumuladas y porcentaje de completados.
+          - [ ] Botón de vaciado que dispare `clearLibrary()`.
+          - [ ] Validar con `bash scripts/classroom-check.sh library-panel`.
+
+          ## Commit sugerido
+          ```
+          feat: implementar LibraryPanel con controles y metricas derivadas (Closes #7)
+          ```
+          """,
+              },
+              {
+                  "title": "[Entrega 8] Composición en main.jsx, integración en App.jsx y Build de Producción",
+                  "body": """
+          ## Objetivo
+          Componer la jerarquía completa de la aplicación, aplicar estilos de tema condicionales y garantizar un empaquetado limpio sin errores.
+
+          ## Qué debe cumplirse
+          - [ ] En `src/main.jsx`, anidar `<ThemeProvider>` y `<GameProvider>` envolviendo a `<App />`.
+          - [ ] En `src/App.jsx`, aplicar condicionalmente la clase `.dark-mode` al contenedor principal.
+          - [ ] Renderizar `Header`, `GameCatalog`, `divider` y `LibraryPanel`.
+          - [ ] Verificar que `npm run lint` y `npm run format:check` pasen sin errores.
+          - [ ] Ejecutar `npm run build` confirmando empaquetado correcto en `dist/`.
+          - [ ] Comprobar suite completa con `bash scripts/classroom-check.sh all`.
+
+          ## Commit sugerido
+          ```
+          feat: componer providers, integrar vistas y validar build (Closes #8)
+          ```
+          """,
+              },
+          ]
+
+          headers = {
+              "Accept": "application/vnd.github+json",
+              "Authorization": f"Bearer {TOKEN}",
+              "X-GitHub-Api-Version": "2022-11-28",
+          }
+
+          def api_request(path, method="GET", payload=None):
+              url = f"{API}{path}"
+              data = json.dumps(payload).encode("utf-8") if payload is not None else None
+              req = urllib.request.Request(url, data=data, headers=headers, method=method)
+              with urllib.request.urlopen(req) as resp:
+                  if resp.status == 204:
+                      return None
+                  return json.loads(resp.read().decode("utf-8"))
+
+          def get_existing_issues():
+              issues = []
+              page = 1
+              while True:
+                  query = urllib.parse.urlencode({"state": "all", "per_page": "100", "page": str(page)})
+                  page_issues = api_request(f"/repos/{REPO}/issues?{query}")
+                  if not page_issues:
+                      break
+                  issues.extend(page_issues)
+                  page += 1
+              return issues
+
+          print("Sincronizando issues de la asignación...")
+          existing = get_existing_issues()
+          existing_titles = {issue["title"].strip(): issue for issue in existing if "pull_request" not in issue}
+
+          for item in ISSUES:
+              title = item["title"].strip()
+              if title in existing_titles:
+                  print(f"OK (ya existe): {title}")
+                  continue
+
+              body = textwrap.dedent(item["body"]).strip()
+              payload = {
+                  "title": title,
+                  "body": body,
+                  "labels": [ISSUE_LABEL],
+              }
+              created = api_request(f"/repos/{REPO}/issues", method="POST", payload=payload)
+              print(f"Creada issue #{created['number']}: {title}")
+
+          print("Sincronización de issues completada.")
+          PY

@@ -1,0 +1,25 @@
+# Dependencias
+node_modules/
+Estado-Global-con-Storage/
+
+# Archivos de build
+dist/
+build/
+*.min.js
+*.min.css
+
+# Archivos de configuración del sistema
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Archivos temporales
+*.tmp
+*.temp
+
+# Archivos de configuración
+.stylelintrc.json
+.eslintrc.json
